@@ -6,9 +6,10 @@ const VIEW_HEIGHT = 540;
 const WORLD_WIDTH = 6400;
 const REQUIRED_FIREFLIES = 20;
 const STORAGE_KEY = 'frogAdventureRecord';
+const LEVEL_LIFT = 45;
 
 const ASSETS = {
-  frog: 'assets/frog.png',
+  frog: 'assets/legu1.png',
 
   sweetkingdom: 'assets/sweetkingdom.png',
   swamp: 'assets/swamp.png',
@@ -58,7 +59,7 @@ export class Game {
     this.rafId = null;
 
     this.level = this.#createLevel();
-    this.player = new Player(60, 420);
+    this.player = new Player(60, 420 - LEVEL_LIFT);
 
     this.record = this.#loadRecord();
     this.ui.record.textContent = `Рекорд: ${this.record}`;
@@ -100,8 +101,21 @@ export class Game {
   }
 
   #createLevel() {
-    const ground = (x, w, y = 480) => ({ x, y, width: w, height: 60, kind: 'ground' });
-    const platform = (x, y, w, kind = 'platform') => ({ x, y, width: w, height: 20, kind });
+    const ground = (x, w, y = 480) => ({
+      x,
+      y: y - LEVEL_LIFT,
+      width: w,
+      height: 60,
+      kind: 'ground'
+    });
+
+    const platform = (x, y, w, kind = 'platform') => ({
+      x,
+      y: y - LEVEL_LIFT,
+      width: w,
+      height: 20,
+      kind
+    });
 
     const platforms = [
       ground(0, 1500),
@@ -135,21 +149,21 @@ export class Game {
     ];
 
     const decorations = [
-      { image: 'cake0', x: 220, y: 408, width: 64, height: 72 },
-      { image: 'cake1', x: 700, y: 412, width: 60, height: 68 },
-      { image: 'cake2', x: 1050, y: 410, width: 62, height: 70 },
-      { image: 'cake3', x: 1380, y: 414, width: 58, height: 66 },
-      { image: 'cake4', x: 760, y: 416, width: 56, height: 64 },
-      { image: 'cake5', x: 1240, y: 412, width: 60, height: 68 },
+      { image: 'cake0', x: 220, y: 408 - LEVEL_LIFT, width: 64, height: 72 },
+      { image: 'cake1', x: 700, y: 412 - LEVEL_LIFT, width: 60, height: 68 },
+      { image: 'cake2', x: 1050, y: 410 - LEVEL_LIFT, width: 62, height: 70 },
+      { image: 'cake3', x: 1380, y: 414 - LEVEL_LIFT, width: 58, height: 66 },
+      { image: 'cake4', x: 760, y: 416 - LEVEL_LIFT, width: 56, height: 64 },
+      { image: 'cake5', x: 1240, y: 412 - LEVEL_LIFT, width: 60, height: 68 },
 
-      { image: 'swampCloud', x: 1650, y: 220, width: 110, height: 60 },
-      { image: 'swampCloud', x: 2300, y: 190, width: 120, height: 64 },
-      { image: 'swampCloud', x: 2800, y: 210, width: 100, height: 56 },
+      { image: 'swampCloud', x: 1650, y: 220 - LEVEL_LIFT, width: 110, height: 60 },
+      { image: 'swampCloud', x: 2300, y: 190 - LEVEL_LIFT, width: 120, height: 64 },
+      { image: 'swampCloud', x: 2800, y: 210 - LEVEL_LIFT, width: 100, height: 56 },
 
-      { image: 'cloudCitizen0', x: 3180, y: 250, width: 48, height: 54 },
-      { image: 'cloudCitizen1', x: 3650, y: 220, width: 46, height: 52 },
-      { image: 'cloudCitizen2', x: 4150, y: 240, width: 48, height: 54 },
-      { image: 'cloudCitizen3', x: 4400, y: 210, width: 46, height: 52 }
+      { image: 'cloudCitizen0', x: 3180, y: 250 - LEVEL_LIFT, width: 48, height: 54 },
+      { image: 'cloudCitizen1', x: 3650, y: 220 - LEVEL_LIFT, width: 46, height: 52 },
+      { image: 'cloudCitizen2', x: 4150, y: 240 - LEVEL_LIFT, width: 48, height: 54 },
+      { image: 'cloudCitizen3', x: 4400, y: 210 - LEVEL_LIFT, width: 46, height: 52 }
     ];
 
     const fireflies = [];
@@ -163,27 +177,39 @@ export class Game {
     ];
 
     positions.forEach(([x, y]) => {
-      fireflies.push({ x, y, collected: false });
+      fireflies.push({ x, y: y - LEVEL_LIFT, collected: false });
     });
 
     const hazards = [
-      { type: 'banana', x: 500, y: 430, width: 48, height: 50, min: 420, max: 760, speed: 110, direction: 1 },
-      { type: 'banana', x: 1000, y: 430, width: 48, height: 50, min: 900, max: 1300, speed: 130, direction: -1 },
-      { type: 'cart', x: 1300, y: 420, width: 70, height: 60, min: 1200, max: 1460, speed: 90, direction: 1 },
+      { type: 'banana', x: 500, y: 430 - LEVEL_LIFT, width: 48, height: 50, min: 420, max: 760, speed: 110, direction: 1 },
+      { type: 'banana', x: 1000, y: 430 - LEVEL_LIFT, width: 48, height: 50, min: 900, max: 1300, speed: 130, direction: -1 },
+      { type: 'cart', x: 1300, y: 420 - LEVEL_LIFT, width: 70, height: 60, min: 1200, max: 1460, speed: 90, direction: 1 },
 
-      { type: 'bird', x: 1900, y: 250, width: 64, height: 46, min: 1800, max: 2150, speed: 150, direction: 1 },
-      { type: 'bird', x: 2500, y: 230, width: 64, height: 46, min: 2380, max: 2720, speed: 170, direction: -1 },
+      { type: 'bird', x: 1900, y: 250 - LEVEL_LIFT, width: 64, height: 46, min: 1800, max: 2150, speed: 150, direction: 1 },
+      { type: 'bird', x: 2500, y: 230 - LEVEL_LIFT, width: 64, height: 46, min: 2380, max: 2720, speed: 170, direction: -1 },
 
-      { type: 'cloudCitizen', x: 3300, y: 290, width: 48, height: 54, min: 3200, max: 3500, speed: 120, direction: 1, imageIndex: 4 },
-      { type: 'cloudCitizen', x: 3900, y: 300, width: 48, height: 54, min: 3800, max: 4150, speed: 140, direction: -1, imageIndex: 5 },
+      { type: 'cloudCitizen', x: 3300, y: 290 - LEVEL_LIFT, width: 48, height: 54, min: 3200, max: 3500, speed: 120, direction: 1, imageIndex: 4 },
+      { type: 'cloudCitizen', x: 3900, y: 300 - LEVEL_LIFT, width: 48, height: 54, min: 3800, max: 4150, speed: 140, direction: -1, imageIndex: 5 },
 
-      { type: 'icicle', x: 4700, y: 220, width: 22, height: 46, min: 4650, max: 4950, speed: 0, direction: 0 },
-      { type: 'icicle', x: 5150, y: 150, width: 22, height: 46, min: 5100, max: 5400, speed: 0, direction: 0 },
-      { type: 'icicle', x: 5600, y: 170, width: 22, height: 46, min: 5550, max: 5850, speed: 0, direction: 0 }
+      { type: 'icicle', x: 4700, y: 220 - LEVEL_LIFT, width: 22, height: 46, min: 4650, max: 4950, speed: 0, direction: 0 },
+      { type: 'icicle', x: 5150, y: 150 - LEVEL_LIFT, width: 22, height: 46, min: 5100, max: 5400, speed: 0, direction: 0 },
+      { type: 'icicle', x: 5600, y: 170 - LEVEL_LIFT, width: 22, height: 46, min: 5550, max: 5850, speed: 0, direction: 0 }
     ];
 
-    const crown = { x: 6120, y: 370, width: 70, height: 70, taken: false };
-    const penguin = { x: 6040, y: 410, width: 64, height: 70 };
+    const crown = {
+      x: 6120,
+      y: 370 - LEVEL_LIFT,
+      width: 70,
+      height: 70,
+      taken: false
+    };
+
+    const penguin = {
+      x: 6040,
+      y: 410 - LEVEL_LIFT,
+      width: 64,
+      height: 70
+    };
 
     return { platforms, decorations, fireflies, hazards, crown, penguin };
   }
@@ -232,10 +258,7 @@ export class Game {
   restart() {
     this.#stopLoop();
     this.#resetLevel();
-    this.#showOverlay(
-      'Заново',
-      'Собери 20 светлячков и доберись до короны.'
-    );
+    this.#showOverlay('Заново', 'Собери 20 светлячков и доберись до короны.');
     this.ui.overlayButton.textContent = 'Начать игру';
     this.state = 'menu';
   }
@@ -282,7 +305,10 @@ export class Game {
 
     this.cameraX = Math.max(
       0,
-      Math.min(this.player.x - VIEW_WIDTH / 2 + this.player.width / 2, WORLD_WIDTH - VIEW_WIDTH)
+      Math.min(
+        this.player.x - VIEW_WIDTH / 2 + this.player.width / 2,
+        WORLD_WIDTH - VIEW_WIDTH
+      )
     );
 
     this.#updateHazards(dt);
@@ -313,12 +339,15 @@ export class Game {
     const playerBox = this.player.getBox();
 
     for (const firefly of this.level.fireflies) {
-      if (!firefly.collected && intersects(playerBox, {
-        x: firefly.x - 14,
-        y: firefly.y - 14,
-        width: 28,
-        height: 28
-      })) {
+      if (
+        !firefly.collected &&
+        intersects(playerBox, {
+          x: firefly.x - 14,
+          y: firefly.y - 14,
+          width: 28,
+          height: 28
+        })
+      ) {
         firefly.collected = true;
         this.score += 1;
       }
@@ -429,7 +458,6 @@ export class Game {
     ctx.save();
     ctx.translate(-this.cameraX, 0);
 
-    this.#renderPlatforms();
     this.#renderDecorations();
     this.#renderFireflies();
     this.#renderHazards();
@@ -459,24 +487,6 @@ export class Game {
 
     ctx.fillStyle = '#20364f';
     ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
-  }
-
-  #renderPlatforms() {
-    const ctx = this.ctx;
-
-    for (const p of this.level.platforms) {
-      if (p.kind === 'lily') {
-        ctx.fillStyle = '#3f9b4c';
-      } else if (p.kind === 'cloud') {
-        ctx.fillStyle = '#ffffff';
-      } else {
-        ctx.fillStyle = '#7b5233';
-      }
-
-      ctx.beginPath();
-      ctx.roundRect(p.x, p.y, p.width, p.height, p.kind === 'cloud' ? 14 : 6);
-      ctx.fill();
-    }
   }
 
   #renderDecorations() {
@@ -557,7 +567,13 @@ export class Game {
     const { crown, penguin } = this.level;
 
     if (crown.taken) {
-      this.#drawImage('penguinLying', penguin.x, penguin.y + 20, penguin.width, penguin.height);
+      this.#drawImage(
+        'penguinLying',
+        penguin.x,
+        penguin.y + 20,
+        penguin.width,
+        penguin.height
+      );
     } else {
       const penguinImage = this.score >= REQUIRED_FIREFLIES ? 'penguin2' : 'penguin';
       this.#drawImage(penguinImage, penguin.x, penguin.y, penguin.width, penguin.height);
@@ -570,7 +586,13 @@ export class Game {
     if (glow) {
       ctx.fillStyle = 'rgba(255, 215, 0, 0.25)';
       ctx.beginPath();
-      ctx.arc(crown.x + crown.width / 2, crown.y + crown.height / 2, 52, 0, Math.PI * 2);
+      ctx.arc(
+        crown.x + crown.width / 2,
+        crown.y + crown.height / 2,
+        52,
+        0,
+        Math.PI * 2
+      );
       ctx.fill();
     }
 
@@ -610,13 +632,29 @@ export class Game {
 
   #drawImage(name, x, y, width, height) {
     const image = this.images[name];
+    const ctx = this.ctx;
 
-    if (image?.complete && image.naturalWidth > 0) {
-      this.ctx.drawImage(image, x, y, width, height);
+    if (!image?.complete || image.naturalWidth === 0) {
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.35)';
+      ctx.fillRect(x, y, width, height);
       return;
     }
 
-    this.ctx.fillStyle = 'rgba(255, 0, 0, 0.35)';
-    this.ctx.fillRect(x, y, width, height);
+    const imageRatio = image.naturalWidth / image.naturalHeight;
+    const boxRatio = width / height;
+
+    let drawWidth = width;
+    let drawHeight = height;
+
+    if (imageRatio > boxRatio) {
+      drawHeight = width / imageRatio;
+    } else {
+      drawWidth = height * imageRatio;
+    }
+
+    const drawX = x + (width - drawWidth) / 2;
+    const drawY = y + (height - drawHeight);
+
+    ctx.drawImage(image, drawX, drawY, drawWidth, drawHeight);
   }
 }
