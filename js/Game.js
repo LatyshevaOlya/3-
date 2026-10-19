@@ -7,11 +7,50 @@ const WORLD_WIDTH = 6400;
 const REQUIRED_FIREFLIES = 20;
 const STORAGE_KEY = 'frogAdventureRecord';
 
+const ASSETS = {
+  frog: 'assets/frog.png',
+
+  sweetkingdom: 'assets/sweetkingdom.png',
+  swamp: 'assets/swamp.png',
+  cloudkingdom: 'assets/cloudkingdom.png',
+  icekingdom: 'assets/icekingdom.png',
+
+  cake0: 'assets/cake.png',
+  cake1: 'assets/cake1.png',
+  cake2: 'assets/cake2.png',
+  cake3: 'assets/cake3.png',
+  cake4: 'assets/cake4.png',
+  cake5: 'assets/cake5.png',
+
+  cart: 'assets/cart.png',
+  banana: 'assets/banstay.png',
+  bananaLying: 'assets/bunlying.png',
+
+  bird: 'assets/bird.png',
+  swampCloud: 'assets/cloud.png',
+
+  cloudCitizen0: 'assets/cloudp.png',
+  cloudCitizen1: 'assets/cloudp1.png',
+  cloudCitizen2: 'assets/cloudp2.png',
+  cloudCitizen3: 'assets/cloudp3.png',
+  cloudCitizen4: 'assets/cloudp4.png',
+  cloudCitizen5: 'assets/cloudp5.png',
+  cloudCitizen6: 'assets/cloudp6.png',
+  cloudCitizen7: 'assets/cloudp7.png',
+
+  penguin: 'assets/pin.png',
+  penguin2: 'assets/pin2.png',
+  penguinLying: 'assets/pinlyung.png'
+};
+
 export class Game {
   constructor(canvas, ui) {
     this.canvas = canvas;
     this.ctx = canvas.getContext('2d');
     this.ui = ui;
+
+    this.images = {};
+    this.assetsReady = false;
 
     this.state = 'menu';
     this.cameraX = 0;
@@ -25,7 +64,39 @@ export class Game {
     this.ui.record.textContent = `Рекорд: ${this.record}`;
 
     this.#bindUI();
+    this.#loadAssets();
     this.#render();
+  }
+
+  #loadAssets() {
+    const names = Object.keys(ASSETS);
+    let loaded = 0;
+
+    names.forEach((name) => {
+      const image = new Image();
+      image.src = ASSETS[name];
+
+      image.onload = () => {
+        loaded += 1;
+
+        if (loaded === names.length) {
+          this.assetsReady = true;
+          this.#render();
+        }
+      };
+
+      image.onerror = () => {
+        console.warn(`Не удалось загрузить рисунок: ${ASSETS[name]}`);
+        loaded += 1;
+
+        if (loaded === names.length) {
+          this.assetsReady = true;
+          this.#render();
+        }
+      };
+
+      this.images[name] = image;
+    });
   }
 
   #createLevel() {
@@ -63,6 +134,24 @@ export class Game {
       ground(5950, 450)
     ];
 
+    const decorations = [
+      { image: 'cake0', x: 220, y: 408, width: 64, height: 72 },
+      { image: 'cake1', x: 700, y: 412, width: 60, height: 68 },
+      { image: 'cake2', x: 1050, y: 410, width: 62, height: 70 },
+      { image: 'cake3', x: 1380, y: 414, width: 58, height: 66 },
+      { image: 'cake4', x: 760, y: 416, width: 56, height: 64 },
+      { image: 'cake5', x: 1240, y: 412, width: 60, height: 68 },
+
+      { image: 'swampCloud', x: 1650, y: 220, width: 110, height: 60 },
+      { image: 'swampCloud', x: 2300, y: 190, width: 120, height: 64 },
+      { image: 'swampCloud', x: 2800, y: 210, width: 100, height: 56 },
+
+      { image: 'cloudCitizen0', x: 3180, y: 250, width: 48, height: 54 },
+      { image: 'cloudCitizen1', x: 3650, y: 220, width: 46, height: 52 },
+      { image: 'cloudCitizen2', x: 4150, y: 240, width: 48, height: 54 },
+      { image: 'cloudCitizen3', x: 4400, y: 210, width: 46, height: 52 }
+    ];
+
     const fireflies = [];
     const positions = [
       [360, 350], [620, 270], [900, 350], [1190, 260],
@@ -78,25 +167,25 @@ export class Game {
     });
 
     const hazards = [
-      { type: 'banana', x: 500, y: 440, width: 36, height: 40, min: 420, max: 760, speed: 110, direction: 1 },
-      { type: 'banana', x: 1000, y: 440, width: 36, height: 40, min: 900, max: 1300, speed: 130, direction: -1 },
-      { type: 'cart', x: 1300, y: 430, width: 52, height: 50, min: 1200, max: 1460, speed: 90, direction: 1 },
+      { type: 'banana', x: 500, y: 430, width: 48, height: 50, min: 420, max: 760, speed: 110, direction: 1 },
+      { type: 'banana', x: 1000, y: 430, width: 48, height: 50, min: 900, max: 1300, speed: 130, direction: -1 },
+      { type: 'cart', x: 1300, y: 420, width: 70, height: 60, min: 1200, max: 1460, speed: 90, direction: 1 },
 
-      { type: 'crow', x: 1900, y: 260, width: 42, height: 30, min: 1800, max: 2150, speed: 150, direction: 1 },
-      { type: 'crow', x: 2500, y: 240, width: 42, height: 30, min: 2380, max: 2720, speed: 170, direction: -1 },
+      { type: 'bird', x: 1900, y: 250, width: 64, height: 46, min: 1800, max: 2150, speed: 150, direction: 1 },
+      { type: 'bird', x: 2500, y: 230, width: 64, height: 46, min: 2380, max: 2720, speed: 170, direction: -1 },
 
-      { type: 'cloudCitizen', x: 3300, y: 300, width: 38, height: 42, min: 3200, max: 3500, speed: 120, direction: 1 },
-      { type: 'cloudCitizen', x: 3900, y: 310, width: 38, height: 42, min: 3800, max: 4150, speed: 140, direction: -1 },
+      { type: 'cloudCitizen', x: 3300, y: 290, width: 48, height: 54, min: 3200, max: 3500, speed: 120, direction: 1, imageIndex: 4 },
+      { type: 'cloudCitizen', x: 3900, y: 300, width: 48, height: 54, min: 3800, max: 4150, speed: 140, direction: -1, imageIndex: 5 },
 
       { type: 'icicle', x: 4700, y: 220, width: 22, height: 46, min: 4650, max: 4950, speed: 0, direction: 0 },
       { type: 'icicle', x: 5150, y: 150, width: 22, height: 46, min: 5100, max: 5400, speed: 0, direction: 0 },
       { type: 'icicle', x: 5600, y: 170, width: 22, height: 46, min: 5550, max: 5850, speed: 0, direction: 0 }
     ];
 
-    const crown = { x: 6120, y: 380, width: 60, height: 60, taken: false };
-    const penguin = { x: 6060, y: 420, width: 44, height: 50 };
+    const crown = { x: 6120, y: 370, width: 70, height: 70, taken: false };
+    const penguin = { x: 6040, y: 410, width: 64, height: 70 };
 
-    return { platforms, fireflies, hazards, crown, penguin };
+    return { platforms, decorations, fireflies, hazards, crown, penguin };
   }
 
   #bindUI() {
@@ -225,10 +314,10 @@ export class Game {
 
     for (const firefly of this.level.fireflies) {
       if (!firefly.collected && intersects(playerBox, {
-        x: firefly.x - 12,
-        y: firefly.y - 12,
-        width: 24,
-        height: 24
+        x: firefly.x - 14,
+        y: firefly.y - 14,
+        width: 28,
+        height: 28
       })) {
         firefly.collected = true;
         this.score += 1;
@@ -327,25 +416,25 @@ export class Game {
     try {
       localStorage.setItem(STORAGE_KEY, String(value));
     } catch {
-      /* Хранилище недоступно — игра продолжается без сохранения */
+      /* Хранилище недоступно */
     }
   }
 
   #render() {
     const ctx = this.ctx;
-    const cameraX = this.cameraX;
 
     ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
     this.#renderBackground();
 
     ctx.save();
-    ctx.translate(-cameraX, 0);
+    ctx.translate(-this.cameraX, 0);
 
     this.#renderPlatforms();
+    this.#renderDecorations();
     this.#renderFireflies();
     this.#renderHazards();
     this.#renderFinish();
-    this.player.render(ctx, cameraX);
+    this.#renderPlayer();
 
     ctx.restore();
   }
@@ -354,19 +443,21 @@ export class Game {
     const ctx = this.ctx;
     const zone = this.#getZoneName();
 
-    const gradients = {
-      'Королевство сладостей': ['#ffc2d1', '#ffe8b0'],
-      'Болото': ['#274e36', '#7bb661'],
-      'Облачное королевство': ['#7fb2ff', '#dff0ff'],
-      'Ледяное королевство': ['#9fd8ff', '#eaf8ff']
+    const backgroundNames = {
+      'Королевство сладостей': 'sweetkingdom',
+      'Болото': 'swamp',
+      'Облачное королевство': 'cloudkingdom',
+      'Ледяное королевство': 'icekingdom'
     };
 
-    const [top, bottom] = gradients[zone];
-    const gradient = ctx.createLinearGradient(0, 0, 0, VIEW_HEIGHT);
-    gradient.addColorStop(0, top);
-    gradient.addColorStop(1, bottom);
+    const image = this.images[backgroundNames[zone]];
 
-    ctx.fillStyle = gradient;
+    if (image?.complete && image.naturalWidth > 0) {
+      ctx.drawImage(image, 0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+      return;
+    }
+
+    ctx.fillStyle = '#20364f';
     ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
   }
 
@@ -374,26 +465,23 @@ export class Game {
     const ctx = this.ctx;
 
     for (const p of this.level.platforms) {
-      if (p.kind === 'ground') {
-        ctx.fillStyle = '#8b5e3c';
-      } else if (p.kind === 'lily') {
+      if (p.kind === 'lily') {
         ctx.fillStyle = '#3f9b4c';
       } else if (p.kind === 'cloud') {
         ctx.fillStyle = '#ffffff';
       } else {
-        ctx.fillStyle = '#a56b3f';
+        ctx.fillStyle = '#7b5233';
       }
 
       ctx.beginPath();
       ctx.roundRect(p.x, p.y, p.width, p.height, p.kind === 'cloud' ? 14 : 6);
       ctx.fill();
+    }
+  }
 
-      if (p.kind === 'cloud') {
-        ctx.fillStyle = 'rgba(255,255,255,0.7)';
-        ctx.beginPath();
-        ctx.roundRect(p.x + 10, p.y - 8, p.width - 20, 12, 8);
-        ctx.fill();
-      }
+  #renderDecorations() {
+    for (const item of this.level.decorations) {
+      this.#drawImage(item.image, item.x, item.y, item.width, item.height);
     }
   }
 
@@ -419,128 +507,116 @@ export class Game {
   }
 
   #renderHazards() {
-    const ctx = this.ctx;
-
     for (const hazard of this.level.hazards) {
       if (hazard.type === 'banana') {
-        ctx.fillStyle = '#ffd23f';
-        ctx.beginPath();
-        ctx.roundRect(hazard.x, hazard.y, hazard.width, hazard.height, 12);
-        ctx.fill();
-
-        ctx.fillStyle = '#111';
-        ctx.fillRect(hazard.x + 8, hazard.y + 12, 6, 6);
-        ctx.fillRect(hazard.x + 22, hazard.y + 12, 6, 6);
+        this.#drawImage('banana', hazard.x, hazard.y, hazard.width, hazard.height);
       }
 
       if (hazard.type === 'cart') {
-        ctx.fillStyle = '#b0413e';
-        ctx.beginPath();
-        ctx.roundRect(hazard.x, hazard.y, hazard.width, hazard.height - 12, 6);
-        ctx.fill();
-
-        ctx.fillStyle = '#e63946';
-        ctx.beginPath();
-        ctx.arc(hazard.x + 26, hazard.y - 4, 14, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#333';
-        ctx.beginPath();
-        ctx.arc(hazard.x + 12, hazard.y + hazard.height - 6, 7, 0, Math.PI * 2);
-        ctx.arc(hazard.x + hazard.width - 12, hazard.y + hazard.height - 6, 7, 0, Math.PI * 2);
-        ctx.fill();
+        this.#drawImage('cart', hazard.x, hazard.y, hazard.width, hazard.height);
       }
 
-      if (hazard.type === 'crow') {
-        ctx.fillStyle = '#222';
-        ctx.beginPath();
-        ctx.ellipse(hazard.x + 21, hazard.y + 15, 20, 12, 0, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#444';
-        ctx.beginPath();
-        ctx.ellipse(hazard.x + 14, hazard.y + 10, 12, 6, -0.5, 0, Math.PI * 2);
-        ctx.fill();
-
-        ctx.fillStyle = '#ffb703';
-        ctx.beginPath();
-        ctx.moveTo(hazard.x + 38, hazard.y + 15);
-        ctx.lineTo(hazard.x + 50, hazard.y + 18);
-        ctx.lineTo(hazard.x + 38, hazard.y + 21);
-        ctx.fill();
+      if (hazard.type === 'bird') {
+        this.#drawImage('bird', hazard.x, hazard.y, hazard.width, hazard.height);
       }
 
       if (hazard.type === 'cloudCitizen') {
-        ctx.fillStyle = '#ffffff';
-        ctx.beginPath();
-        ctx.roundRect(hazard.x, hazard.y, hazard.width, hazard.height, 16);
-        ctx.fill();
-
-        ctx.fillStyle = '#5aa9ff';
-        ctx.fillRect(hazard.x + 9, hazard.y + 14, 6, 6);
-        ctx.fillRect(hazard.x + 23, hazard.y + 14, 6, 6);
+        this.#drawImage(
+          `cloudCitizen${hazard.imageIndex}`,
+          hazard.x,
+          hazard.y,
+          hazard.width,
+          hazard.height
+        );
       }
 
       if (hazard.type === 'icicle') {
-        ctx.fillStyle = '#bfe9ff';
-        ctx.beginPath();
-        ctx.moveTo(hazard.x, hazard.y);
-        ctx.lineTo(hazard.x + hazard.width, hazard.y);
-        ctx.lineTo(hazard.x + hazard.width / 2, hazard.y + hazard.height);
-        ctx.fill();
+        this.#renderIcicle(hazard);
       }
     }
+  }
+
+  #renderIcicle(hazard) {
+    const ctx = this.ctx;
+
+    ctx.fillStyle = '#bfe9ff';
+    ctx.beginPath();
+    ctx.moveTo(hazard.x, hazard.y);
+    ctx.lineTo(hazard.x + hazard.width, hazard.y);
+    ctx.lineTo(hazard.x + hazard.width / 2, hazard.y + hazard.height);
+    ctx.closePath();
+    ctx.fill();
+
+    ctx.strokeStyle = '#e8f8ff';
+    ctx.lineWidth = 2;
+    ctx.stroke();
   }
 
   #renderFinish() {
     const ctx = this.ctx;
     const { crown, penguin } = this.level;
 
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.ellipse(penguin.x + 22, penguin.y + 28, 20, 24, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#fff';
-    ctx.beginPath();
-    ctx.ellipse(penguin.x + 22, penguin.y + 32, 13, 18, 0, 0, Math.PI * 2);
-    ctx.fill();
-
-    ctx.fillStyle = '#ffb703';
-    ctx.beginPath();
-    ctx.moveTo(penguin.x + 16, penguin.y + 34);
-    ctx.lineTo(penguin.x + 28, penguin.y + 34);
-    ctx.lineTo(penguin.x + 22, penguin.y + 42);
-    ctx.fill();
+    if (crown.taken) {
+      this.#drawImage('penguinLying', penguin.x, penguin.y + 20, penguin.width, penguin.height);
+    } else {
+      const penguinImage = this.score >= REQUIRED_FIREFLIES ? 'penguin2' : 'penguin';
+      this.#drawImage(penguinImage, penguin.x, penguin.y, penguin.width, penguin.height);
+    }
 
     if (crown.taken) return;
 
-    const glow = this.score >= REQUIRED_FIREFLIES ? 1 : 0.35;
+    const glow = this.score >= REQUIRED_FIREFLIES;
 
-    ctx.fillStyle = `rgba(255, 215, 0, ${glow})`;
+    if (glow) {
+      ctx.fillStyle = 'rgba(255, 215, 0, 0.25)';
+      ctx.beginPath();
+      ctx.arc(crown.x + crown.width / 2, crown.y + crown.height / 2, 52, 0, Math.PI * 2);
+      ctx.fill();
+    }
+
+    ctx.fillStyle = glow ? '#ffd700' : '#b28e2b';
     ctx.beginPath();
     ctx.moveTo(crown.x, crown.y + crown.height);
-    ctx.lineTo(crown.x, crown.y + 18);
-    ctx.lineTo(crown.x + 15, crown.y + 34);
-    ctx.lineTo(crown.x + 30, crown.y);
-    ctx.lineTo(crown.x + 45, crown.y + 34);
-    ctx.lineTo(crown.x + 60, crown.y + 18);
-    ctx.lineTo(crown.x + 60, crown.y + crown.height);
+    ctx.lineTo(crown.x, crown.y + 20);
+    ctx.lineTo(crown.x + 17, crown.y + 38);
+    ctx.lineTo(crown.x + 35, crown.y);
+    ctx.lineTo(crown.x + 53, crown.y + 38);
+    ctx.lineTo(crown.x + 70, crown.y + 20);
+    ctx.lineTo(crown.x + 70, crown.y + crown.height);
+    ctx.closePath();
     ctx.fill();
 
-    if (this.score < REQUIRED_FIREFLIES) {
+    if (!glow) {
       ctx.fillStyle = '#333';
       ctx.font = '16px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(
         `Нужно ${REQUIRED_FIREFLIES} светлячков`,
-        crown.x + 30,
+        crown.x + crown.width / 2,
         crown.y - 16
       );
     }
   }
 
-  setInput(input) {
-    this.input = input;
+  #renderPlayer() {
+    this.#drawImage(
+      'frog',
+      this.player.x,
+      this.player.y,
+      this.player.width,
+      this.player.height
+    );
+  }
+
+  #drawImage(name, x, y, width, height) {
+    const image = this.images[name];
+
+    if (image?.complete && image.naturalWidth > 0) {
+      this.ctx.drawImage(image, x, y, width, height);
+      return;
+    }
+
+    this.ctx.fillStyle = 'rgba(255, 0, 0, 0.35)';
+    this.ctx.fillRect(x, y, width, height);
   }
 }
