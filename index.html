@@ -8,7 +8,9 @@
 </head>
 <body>
   <div class="game-shell">
-    <header class="hud">
+    <canvas id="game"></canvas>
+
+    <div class="hud">
       <div class="hud__left">
         <span id="score">Светлячки: 0 / 20</span>
         <span id="zone">Локация: Королевство сладостей</span>
@@ -19,26 +21,23 @@
         <button id="startBtn" type="button">Старт</button>
         <button id="pauseBtn" type="button">Пауза</button>
         <button id="restartBtn" type="button">Заново</button>
+        <button id="fullscreenBtn" type="button">Во весь экран</button>
       </div>
-    </header>
+    </div>
 
-    <div class="canvas-wrap">
-      <canvas id="game" width="960" height="540"></canvas>
+    <div id="overlay" class="overlay">
+      <h2 id="overlayTitle">Приключения лягушки</h2>
 
-      <div id="overlay" class="overlay">
-        <h2 id="overlayTitle">Приключения лягушки</h2>
+      <p id="overlayText">
+        Собери 20 светлячков и доберись до короны.<br><br>
+        Управление: ← → или A/D — движение.<br>
+        Space, W или ↑ — прыжок.<br>
+        Повторный прыжок в воздухе запрещён.<br><br>
+        Опасны: полицейские-бананы, тележка, вороны,<br>
+        жители облаков, сосульки и падение.
+      </p>
 
-        <p id="overlayText">
-          Собери 20 светлячков и доберись до короны.<br><br>
-          Управление: ← → или A/D — движение.<br>
-          Space, W или ↑ — прыжок.<br>
-          Повторный прыжок в воздухе запрещён.<br><br>
-          Опасны: полицейские-бананы, тележка, вороны,<br>
-          жители облаков, сосульки и падение.
-        </p>
-
-        <button id="overlayBtn" type="button">Начать игру</button>
-      </div>
+      <button id="overlayBtn" type="button">Начать игру</button>
     </div>
 
     <div class="touch-controls" aria-label="Мобильное управление">

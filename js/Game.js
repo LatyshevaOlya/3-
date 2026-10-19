@@ -1,12 +1,11 @@
 import { Player } from './Player.js';
 import { intersects } from './collision.js';
 
-const VIEW_WIDTH = 960;
-const VIEW_HEIGHT = 540;
-const WORLD_WIDTH = 6400;
+const WORLD_WIDTH = 7200;
 const REQUIRED_FIREFLIES = 20;
 const STORAGE_KEY = 'frogAdventureRecord';
 const LEVEL_LIFT = 45;
+const CAMERA_ZOOM = 1.25;
 
 const ASSETS = {
   frog: 'assets/legu1.png',
@@ -51,21 +50,33 @@ export class Game {
     this.ui = ui;
 
     this.images = {};
-    this.assetsReady = false;
-
     this.state = 'menu';
     this.cameraX = 0;
     this.lastTime = 0;
     this.rafId = null;
 
+    this.viewWidth = 960;
+    this.viewHeight = 540;
+
     this.level = this.#createLevel();
-    this.player = new Player(60, 420 - LEVEL_LIFT);
+    this.player = new Player(80, 380 - LEVEL_LIFT);
 
     this.record = this.#loadRecord();
     this.ui.record.textContent = `Рекорд: ${this.record}`;
 
     this.#bindUI();
+    this.#resize();
     this.#loadAssets();
+    this.#render();
+  }
+
+  #resize() {
+    this.canvas.width = window.innerWidth;
+    this.canvas.height = window.innerHeight;
+
+    this.viewWidth = this.canvas.width / CAMERA_ZOOM;
+    this.viewHeight = this.canvas.height / CAMERA_ZOOM;
+
     this.#render();
   }
 
@@ -85,7 +96,6 @@ export class Game {
         }
 
         if (loaded === names.length) {
-          this.assetsReady = true;
           this.#render();
         }
       };
@@ -95,7 +105,6 @@ export class Game {
         loaded += 1;
 
         if (loaded === names.length) {
-          this.assetsReady = true;
           this.#render();
         }
       };
@@ -105,11 +114,11 @@ export class Game {
   }
 
   #createLevel() {
-    const ground = (x, w, y = 480) => ({
+    const ground = (x, w, y = 520) => ({
       x,
       y: y - LEVEL_LIFT,
       width: w,
-      height: 60,
+      height: 80,
       kind: 'ground'
     });
 
@@ -117,67 +126,74 @@ export class Game {
       x,
       y: y - LEVEL_LIFT,
       width: w,
-      height: 20,
+      height: 24,
       kind
     });
 
     const platforms = [
-      ground(0, 1500),
-      platform(320, 390, 140),
-      platform(580, 310, 130),
-      platform(860, 390, 150),
-      platform(1150, 300, 140),
+      ground(0, 1700),
+      platform(380, 420, 170),
+      platform(680, 330, 160),
+      platform(1000, 420, 180),
+      platform(1330, 320, 170),
 
-      platform(1500, 470, 120, 'lily'),
-      platform(1720, 410, 110, 'lily'),
-      platform(1940, 350, 110, 'cloud'),
-      platform(2180, 420, 120, 'lily'),
-      platform(2420, 330, 120, 'cloud'),
-      platform(2660, 400, 120, 'lily'),
-      platform(2880, 300, 150, 'cloud'),
+      platform(1700, 500, 150, 'lily'),
+      platform(1960, 430, 140, 'lily'),
+      platform(2220, 360, 150, 'cloud'),
+      platform(2500, 450, 160, 'lily'),
+      platform(2780, 350, 160, 'cloud'),
+      platform(3060, 430, 160, 'lily'),
+      platform(3320, 320, 190, 'cloud'),
 
-      platform(3100, 430, 130, 'cloud'),
-      platform(3330, 350, 120, 'cloud'),
-      platform(3560, 270, 120, 'cloud'),
-      platform(3800, 360, 130, 'cloud'),
-      platform(4040, 280, 130, 'cloud'),
-      platform(4280, 380, 140, 'cloud'),
+      platform(3600, 460, 170, 'cloud'),
+      platform(3880, 370, 160, 'cloud'),
+      platform(4160, 280, 160, 'cloud'),
+      platform(4450, 390, 170, 'cloud'),
+      platform(4740, 300, 170, 'cloud'),
+      platform(5030, 410, 180, 'cloud'),
 
-      platform(4550, 450, 130),
-      platform(4790, 370, 120),
-      platform(5030, 290, 120),
-      platform(5270, 380, 130),
-      platform(5510, 300, 130),
-      platform(5750, 400, 160),
-      ground(5950, 450)
+      platform(5350, 480, 170),
+      platform(5640, 390, 160),
+      platform(5930, 300, 160),
+      platform(6220, 400, 170),
+      platform(6510, 310, 170),
+      platform(6800, 430, 200),
+      ground(7050, 150)
     ];
 
     const decorations = [
-      { image: 'cake0', x: 200, y: 370 - LEVEL_LIFT, width: 92, height: 104 },
-      { image: 'cake1', x: 680, y: 376 - LEVEL_LIFT, width: 86, height: 98 },
-      { image: 'cake2', x: 1030, y: 372 - LEVEL_LIFT, width: 90, height: 102 },
-      { image: 'cake3', x: 1360, y: 378 - LEVEL_LIFT, width: 84, height: 96 },
-      { image: 'cake4', x: 740, y: 380 - LEVEL_LIFT, width: 80, height: 92 },
-      { image: 'cake5', x: 1220, y: 374 - LEVEL_LIFT, width: 86, height: 98 },
+      { image: 'cake0', x: 180, y: 390 - LEVEL_LIFT, width: 110, height: 125 },
+      { image: 'cake1', x: 520, y: 400 - LEVEL_LIFT, width: 100, height: 115 },
+      { image: 'cake2', x: 820, y: 395 - LEVEL_LIFT, width: 105, height: 120 },
+      { image: 'cake3', x: 1150, y: 402 - LEVEL_LIFT, width: 95, height: 110 },
+      { image: 'cake4', x: 1450, y: 398 - LEVEL_LIFT, width: 100, height: 115 },
+      { image: 'cake5', x: 1600, y: 404 - LEVEL_LIFT, width: 92, height: 106 },
 
-      { image: 'swampCloud', x: 1620, y: 180 - LEVEL_LIFT, width: 160, height: 88 },
-      { image: 'swampCloud', x: 2270, y: 145 - LEVEL_LIFT, width: 175, height: 94 },
-      { image: 'swampCloud', x: 2770, y: 170 - LEVEL_LIFT, width: 145, height: 80 },
+      { image: 'cake0', x: 700, y: 402 - LEVEL_LIFT, width: 88, height: 100 },
+      { image: 'cake1', x: 1060, y: 406 - LEVEL_LIFT, width: 84, height: 96 },
+      { image: 'cake2', x: 1380, y: 400 - LEVEL_LIFT, width: 90, height: 104 },
+      { image: 'cake3', x: 240, y: 408 - LEVEL_LIFT, width: 82, height: 94 },
+      { image: 'cake4', x: 940, y: 410 - LEVEL_LIFT, width: 80, height: 92 },
+      { image: 'cake5', x: 1240, y: 406 - LEVEL_LIFT, width: 86, height: 98 },
 
-      { image: 'cloudCitizen0', x: 3150, y: 210 - LEVEL_LIFT, width: 70, height: 78 },
-      { image: 'cloudCitizen1', x: 3620, y: 175 - LEVEL_LIFT, width: 66, height: 74 },
-      { image: 'cloudCitizen2', x: 4120, y: 200 - LEVEL_LIFT, width: 70, height: 78 },
-      { image: 'cloudCitizen3', x: 4370, y: 165 - LEVEL_LIFT, width: 66, height: 74 }
+      { image: 'swampCloud', x: 1850, y: 190 - LEVEL_LIFT, width: 190, height: 105 },
+      { image: 'swampCloud', x: 2600, y: 150 - LEVEL_LIFT, width: 210, height: 115 },
+      { image: 'swampCloud', x: 3150, y: 185 - LEVEL_LIFT, width: 175, height: 96 },
+
+      { image: 'cloudCitizen0', x: 3650, y: 220 - LEVEL_LIFT, width: 85, height: 95 },
+      { image: 'cloudCitizen1', x: 4250, y: 180 - LEVEL_LIFT, width: 80, height: 90 },
+      { image: 'cloudCitizen2', x: 4850, y: 215 - LEVEL_LIFT, width: 85, height: 95 },
+      { image: 'cloudCitizen3', x: 5150, y: 175 - LEVEL_LIFT, width: 80, height: 90 }
     ];
 
     const fireflies = [];
     const positions = [
-      [360, 350], [620, 270], [900, 350], [1190, 260],
-      [1540, 430], [1760, 370], [1980, 310], [2220, 380],
-      [2460, 290], [2700, 360], [2920, 260],
-      [3140, 390], [3370, 310], [3600, 230], [3840, 320],
-      [4080, 240], [4320, 340],
-      [4590, 410], [4830, 330], [5070, 250]
+      [420, 380], [720, 290], [1040, 380], [1370, 280],
+      [1740, 460], [2000, 390], [2260, 320], [2540, 410],
+      [2820, 310], [3100, 390], [3360, 280],
+      [3640, 420], [3920, 330], [4200, 240], [4490, 350],
+      [4780, 260], [5070, 370],
+      [5390, 440], [5680, 350], [5970, 260]
     ];
 
     positions.forEach(([x, y]) => {
@@ -189,34 +205,38 @@ export class Game {
     });
 
     const hazards = [
-      { type: 'banana', x: 500, y: 400 - LEVEL_LIFT, width: 70, height: 74, min: 420, max: 760, speed: 110, direction: 1 },
-      { type: 'banana', x: 1000, y: 400 - LEVEL_LIFT, width: 70, height: 74, min: 900, max: 1300, speed: 130, direction: -1 },
-      { type: 'cart', x: 1290, y: 385 - LEVEL_LIFT, width: 104, height: 90, min: 1200, max: 1460, speed: 90, direction: 1 },
+      { type: 'banana', x: 550, y: 420 - LEVEL_LIFT, width: 85, height: 90, min: 450, max: 900, speed: 130, direction: 1 },
+      { type: 'banana', x: 1150, y: 420 - LEVEL_LIFT, width: 85, height: 90, min: 1050, max: 1550, speed: 155, direction: -1 },
+      { type: 'cart', x: 1350, y: 400 - LEVEL_LIFT, width: 130, height: 115, min: 1250, max: 1650, speed: 110, direction: 1 },
 
-      { type: 'bird', x: 1880, y: 210 - LEVEL_LIFT, width: 94, height: 68, min: 1800, max: 2150, speed: 150, direction: 1 },
-      { type: 'bird', x: 2480, y: 185 - LEVEL_LIFT, width: 94, height: 68, min: 2380, max: 2720, speed: 170, direction: -1 },
+      { type: 'banana', x: 1750, y: 450 - LEVEL_LIFT, width: 85, height: 90, min: 1700, max: 2100, speed: 120, direction: 1 },
+      { type: 'cart', x: 2450, y: 400 - LEVEL_LIFT, width: 130, height: 115, min: 2350, max: 2750, speed: 100, direction: -1 },
 
-      { type: 'cloudCitizen', x: 3280, y: 250 - LEVEL_LIFT, width: 70, height: 78, min: 3200, max: 3500, speed: 120, direction: 1, imageIndex: 4 },
-      { type: 'cloudCitizen', x: 3880, y: 260 - LEVEL_LIFT, width: 70, height: 78, min: 3800, max: 4150, speed: 140, direction: -1, imageIndex: 5 },
+      { type: 'bird', x: 2200, y: 230 - LEVEL_LIFT, width: 115, height: 82, min: 2100, max: 2600, speed: 180, direction: 1 },
+      { type: 'bird', x: 2900, y: 200 - LEVEL_LIFT, width: 115, height: 82, min: 2800, max: 3300, speed: 200, direction: -1 },
 
-      { type: 'icicle', x: 4700, y: 190 - LEVEL_LIFT, width: 30, height: 64, min: 4650, max: 4950, speed: 0, direction: 0 },
-      { type: 'icicle', x: 5150, y: 115 - LEVEL_LIFT, width: 30, height: 64, min: 5100, max: 5400, speed: 0, direction: 0 },
-      { type: 'icicle', x: 5600, y: 135 - LEVEL_LIFT, width: 30, height: 64, min: 5550, max: 5850, speed: 0, direction: 0 }
+      { type: 'cloudCitizen', x: 3700, y: 290 - LEVEL_LIFT, width: 85, height: 95, min: 3600, max: 4050, speed: 145, direction: 1, imageIndex: 4 },
+      { type: 'cloudCitizen', x: 4400, y: 300 - LEVEL_LIFT, width: 85, height: 95, min: 4300, max: 4800, speed: 165, direction: -1, imageIndex: 5 },
+      { type: 'cloudCitizen', x: 5000, y: 280 - LEVEL_LIFT, width: 85, height: 95, min: 4900, max: 5350, speed: 150, direction: 1, imageIndex: 6 },
+
+      { type: 'icicle', x: 5600, y: 200 - LEVEL_LIFT, width: 36, height: 78, min: 5550, max: 5950, speed: 0, direction: 0 },
+      { type: 'icicle', x: 6150, y: 120 - LEVEL_LIFT, width: 36, height: 78, min: 6100, max: 6500, speed: 0, direction: 0 },
+      { type: 'icicle', x: 6700, y: 150 - LEVEL_LIFT, width: 36, height: 78, min: 6650, max: 7050, speed: 0, direction: 0 }
     ];
 
     const crown = {
-      x: 6100,
-      y: 330 - LEVEL_LIFT,
-      width: 100,
-      height: 100,
+      x: 7050,
+      y: 350 - LEVEL_LIFT,
+      width: 120,
+      height: 120,
       taken: false
     };
 
     const penguin = {
-      x: 6010,
-      y: 375 - LEVEL_LIFT,
-      width: 92,
-      height: 100
+      x: 6950,
+      y: 400 - LEVEL_LIFT,
+      width: 110,
+      height: 120
     };
 
     return {
@@ -234,6 +254,8 @@ export class Game {
     this.ui.pause.addEventListener('click', () => this.togglePause());
     this.ui.restart.addEventListener('click', () => this.restart());
     this.ui.overlayButton.addEventListener('click', () => this.start());
+
+    window.addEventListener('resize', () => this.#resize());
 
     document.addEventListener('visibilitychange', () => {
       if (document.hidden && this.state === 'playing') {
@@ -329,8 +351,8 @@ export class Game {
     this.cameraX = Math.max(
       0,
       Math.min(
-        this.player.x - VIEW_WIDTH / 2 + this.player.width / 2,
-        WORLD_WIDTH - VIEW_WIDTH
+        this.player.x - this.viewWidth / 2 + this.player.width / 2,
+        WORLD_WIDTH - this.viewWidth
       )
     );
 
@@ -365,10 +387,10 @@ export class Game {
       if (
         !firefly.collected &&
         intersects(playerBox, {
-          x: firefly.x - 16,
-          y: firefly.y - 16,
-          width: 32,
-          height: 32
+          x: firefly.x - 18,
+          y: firefly.y - 18,
+          width: 36,
+          height: 36
         })
       ) {
         firefly.collected = true;
@@ -397,7 +419,7 @@ export class Game {
   #checkDanger() {
     const playerBox = this.player.getBox();
 
-    if (playerBox.y > VIEW_HEIGHT + 80) {
+    if (playerBox.y > this.viewHeight + 120) {
       this.#lose('Лягушка упала!');
       return;
     }
@@ -418,9 +440,9 @@ export class Game {
   #getZoneName() {
     const x = this.player.x;
 
-    if (x < 1500) return 'Королевство сладостей';
-    if (x < 3000) return 'Болото';
-    if (x < 4500) return 'Облачное королевство';
+    if (x < 1700) return 'Королевство сладостей';
+    if (x < 3500) return 'Болото';
+    if (x < 5350) return 'Облачное королевство';
     return 'Ледяное королевство';
   }
 
@@ -475,10 +497,12 @@ export class Game {
   #render() {
     const ctx = this.ctx;
 
-    ctx.clearRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
+    ctx.clearRect(0, 0, this.canvas.width, this.canvas.height);
+
     this.#renderBackground();
 
-    ctx.save();
+    ctx.scale(CAMERA_ZOOM, CAMERA_ZOOM);
     ctx.translate(-this.cameraX, 0);
 
     this.#renderDecorations();
@@ -487,7 +511,7 @@ export class Game {
     this.#renderFinish();
     this.#renderPlayer();
 
-    ctx.restore();
+    ctx.setTransform(1, 0, 0, 1, 0, 0);
   }
 
   #renderBackground() {
@@ -504,12 +528,12 @@ export class Game {
     const image = this.images[backgroundNames[zone]];
 
     if (image?.complete && image.naturalWidth > 0) {
-      ctx.drawImage(image, 0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+      ctx.drawImage(image, 0, 0, this.canvas.width, this.canvas.height);
       return;
     }
 
     ctx.fillStyle = '#f3f4f6';
-    ctx.fillRect(0, 0, VIEW_WIDTH, VIEW_HEIGHT);
+    ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
   }
 
   #renderDecorations() {
@@ -525,16 +549,16 @@ export class Game {
     for (const firefly of this.level.fireflies) {
       if (firefly.collected) continue;
 
-      const glow = 9 + Math.sin(time + firefly.x) * 3;
+      const glow = 10 + Math.sin(time + firefly.x) * 3;
 
       ctx.fillStyle = 'rgba(255, 236, 120, 0.35)';
       ctx.beginPath();
-      ctx.arc(firefly.x, firefly.y, glow + 8, 0, Math.PI * 2);
+      ctx.arc(firefly.x, firefly.y, glow + 9, 0, Math.PI * 2);
       ctx.fill();
 
       ctx.fillStyle = '#ffe066';
       ctx.beginPath();
-      ctx.arc(firefly.x, firefly.y, 7, 0, Math.PI * 2);
+      ctx.arc(firefly.x, firefly.y, 8, 0, Math.PI * 2);
       ctx.fill();
     }
   }
@@ -593,7 +617,7 @@ export class Game {
       this.#drawImage(
         'penguinLying',
         penguin.x,
-        penguin.y + 20,
+        penguin.y + 25,
         penguin.width,
         penguin.height
       );
@@ -612,7 +636,7 @@ export class Game {
       ctx.arc(
         crown.x + crown.width / 2,
         crown.y + crown.height / 2,
-        70,
+        85,
         0,
         Math.PI * 2
       );
@@ -622,23 +646,23 @@ export class Game {
     ctx.fillStyle = glow ? '#ffd700' : '#b28e2b';
     ctx.beginPath();
     ctx.moveTo(crown.x, crown.y + crown.height);
-    ctx.lineTo(crown.x, crown.y + 28);
-    ctx.lineTo(crown.x + 25, crown.y + 54);
-    ctx.lineTo(crown.x + 50, crown.y);
-    ctx.lineTo(crown.x + 75, crown.y + 54);
-    ctx.lineTo(crown.x + 100, crown.y + 28);
-    ctx.lineTo(crown.x + 100, crown.y + crown.height);
+    ctx.lineTo(crown.x, crown.y + 32);
+    ctx.lineTo(crown.x + 30, crown.y + 62);
+    ctx.lineTo(crown.x + 60, crown.y);
+    ctx.lineTo(crown.x + 90, crown.y + 62);
+    ctx.lineTo(crown.x + 120, crown.y + 32);
+    ctx.lineTo(crown.x + 120, crown.y + crown.height);
     ctx.closePath();
     ctx.fill();
 
     if (!glow) {
       ctx.fillStyle = '#333';
-      ctx.font = '18px sans-serif';
+      ctx.font = '22px sans-serif';
       ctx.textAlign = 'center';
       ctx.fillText(
         `Нужно ${REQUIRED_FIREFLIES} светлячков`,
         crown.x + crown.width / 2,
-        crown.y - 20
+        crown.y - 24
       );
     }
   }
@@ -652,7 +676,7 @@ export class Game {
     const ctx = this.ctx;
 
     if (!image?.complete || image.naturalWidth === 0) {
-      ctx.fillStyle = 'rgba(255, 0, 0, 0.35)';
+      ctx.fillStyle = 'rgba(255, 0, 0, 0.4)';
       ctx.fillRect(x, y, width, height);
       return;
     }
