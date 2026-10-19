@@ -1,5 +1,4 @@
 :root {
-  --panel: #ffffff;
   --accent: #7ee787;
   --text: #1f2937;
 }
@@ -59,7 +58,6 @@ body {
 
 .canvas-wrap {
   position: relative;
-  border-radius: 0;
   overflow: hidden;
   background: transparent;
 }

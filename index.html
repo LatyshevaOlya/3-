@@ -13,6 +13,7 @@
         <span id="score">Светлячки: 0 / 20</span>
         <span id="zone">Локация: Королевство сладостей</span>
       </div>
+
       <div class="hud__right">
         <span id="record">Рекорд: 0</span>
         <button id="startBtn" type="button">Старт</button>
@@ -26,11 +27,16 @@
 
       <div id="overlay" class="overlay">
         <h2 id="overlayTitle">Приключения лягушки</h2>
+
         <p id="overlayText">
-          Собери 20 светлячков и доберись до короны.<br>
-          Управление: ← → или A/D — движение, Space/W — прыжок.<br>
-          Повторный прыжок в воздухе запрещён.
+          Собери 20 светлячков и доберись до короны.<br><br>
+          Управление: ← → или A/D — движение.<br>
+          Space, W или ↑ — прыжок.<br>
+          Повторный прыжок в воздухе запрещён.<br><br>
+          Опасны: полицейские-бананы, тележка, вороны,<br>
+          жители облаков, сосульки и падение.
         </p>
+
         <button id="overlayBtn" type="button">Начать игру</button>
       </div>
     </div>
@@ -40,14 +46,9 @@
         <button id="leftBtn" type="button" aria-label="Влево">◀</button>
         <button id="rightBtn" type="button" aria-label="Вправо">▶</button>
       </div>
+
       <button id="jumpBtn" type="button" aria-label="Прыжок">Прыжок</button>
     </div>
-
-    <p class="hint">
-      Собери все светлячки, затем дойди до пингвина в Ледяном королевстве и столкни его,
-      чтобы получить корону. Падение в воду, полицейские-бананы, вороны, жители облаков
-      и сосульки опасны.
-    </p>
   </div>
 
   <script type="module" src="js/main.js"></script>

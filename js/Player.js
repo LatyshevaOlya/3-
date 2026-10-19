@@ -2,8 +2,8 @@ import { resolvePlatformCollision } from './collision.js';
 
 export class Player {
   constructor(x, y) {
-    this.width = 34;
-    this.height = 34;
+    this.width = 52;
+    this.height = 52;
     this.startX = x;
     this.startY = y;
 
@@ -16,7 +16,7 @@ export class Player {
     this.vx = 0;
     this.vy = 0;
     this.speed = 280;
-    this.jumpSpeed = -620;
+    this.jumpSpeed = -660;
     this.gravity = 1700;
     this.onGround = false;
     this.facing = 1;
@@ -64,41 +64,33 @@ export class Player {
   }
 
   render(ctx, cameraX) {
-    const x = this.x - cameraX;
-    const y = this.y;
-    const bounce = this.onGround ? Math.sin(this.animationTime * 14) * 1.5 : 0;
+    const image = this.image;
 
-    ctx.fillStyle = '#5ec26a';
-    ctx.beginPath();
-    ctx.ellipse(x + 17, y + 20 + bounce, 17, 14, 0, 0, Math.PI * 2);
-    ctx.fill();
+    if (image?.complete && image.naturalWidth > 0) {
+      const ratio = image.naturalWidth / image.naturalHeight;
+      const boxRatio = this.width / this.height;
 
-    ctx.fillStyle = '#7ee787';
-    ctx.beginPath();
-    ctx.ellipse(x + 17, y + 14 + bounce, 13, 11, 0, 0, Math.PI * 2);
-    ctx.fill();
+      let drawWidth = this.width;
+      let drawHeight = this.height;
 
-    ctx.fillStyle = '#ffffff';
-    ctx.beginPath();
-    ctx.arc(x + 12 + this.facing * 2, y + 12 + bounce, 4.5, 0, Math.PI * 2);
-    ctx.arc(x + 22 + this.facing * 2, y + 12 + bounce, 4.5, 0, Math.PI * 2);
-    ctx.fill();
+      if (ratio > boxRatio) {
+        drawHeight = this.width / ratio;
+      } else {
+        drawWidth = this.height * ratio;
+      }
 
-    ctx.fillStyle = '#111';
-    ctx.beginPath();
-    ctx.arc(x + 12 + this.facing * 3, y + 12 + bounce, 2, 0, Math.PI * 2);
-    ctx.arc(x + 22 + this.facing * 3, y + 12 + bounce, 2, 0, Math.PI * 2);
-    ctx.fill();
+      const drawX = this.x + (this.width - drawWidth) / 2;
+      const drawY = this.y + (this.height - drawHeight);
 
-    ctx.strokeStyle = '#3f9b4c';
-    ctx.lineWidth = 4;
-    ctx.lineCap = 'round';
+      ctx.drawImage(image, drawX - cameraX, drawY, drawWidth, drawHeight);
+      return;
+    }
 
-    ctx.beginPath();
-    ctx.moveTo(x + 10, y + 31 + bounce);
-    ctx.lineTo(x + 8, y + 38 + bounce);
-    ctx.moveTo(x + 24, y + 31 + bounce);
-    ctx.lineTo(x + 26, y + 38 + bounce);
-    ctx.stroke();
+    ctx.fillStyle = 'rgba(255, 0, 0, 0.35)';
+    ctx.fillRect(this.x - cameraX, this.y, this.width, this.height);
+  }
+
+  setImage(image) {
+    this.image = image;
   }
 }
