@@ -1,9 +1,7 @@
 :root {
-  --bg: #10233b;
-  --panel: #172c47;
+  --panel: #ffffff;
   --accent: #7ee787;
-  --danger: #ff6b6b;
-  --text: #eaf2ff;
+  --text: #1f2937;
 }
 
 * {
@@ -18,10 +16,7 @@ body {
   padding: 16px;
   font-family: "Trebuchet MS", system-ui, sans-serif;
   color: var(--text);
-  background:
-    radial-gradient(circle at 20% 10%, #29496f 0, transparent 40%),
-    radial-gradient(circle at 80% 90%, #1f5c50 0, transparent 45%),
-    var(--bg);
+  background: #f3f4f6;
 }
 
 .game-shell {
@@ -34,11 +29,8 @@ body {
   gap: 12px;
   justify-content: space-between;
   align-items: center;
-  background: var(--panel);
-  border: 2px solid #2c4a70;
-  border-radius: 14px;
-  padding: 12px 16px;
-  margin-bottom: 12px;
+  background: transparent;
+  padding: 0 4px 12px;
 }
 
 .hud__left,
@@ -47,12 +39,13 @@ body {
   flex-wrap: wrap;
   gap: 12px;
   align-items: center;
+  font-weight: 700;
 }
 
 .hud button {
   border: 0;
-  border-radius: 9px;
-  padding: 9px 14px;
+  border-radius: 10px;
+  padding: 10px 16px;
   font: inherit;
   font-weight: 700;
   color: #08240f;
@@ -66,10 +59,9 @@ body {
 
 .canvas-wrap {
   position: relative;
-  border: 3px solid #2c4a70;
-  border-radius: 16px;
+  border-radius: 0;
   overflow: hidden;
-  background: #000;
+  background: transparent;
 }
 
 canvas {
@@ -86,7 +78,8 @@ canvas {
   gap: 16px;
   text-align: center;
   padding: 24px;
-  background: rgba(6, 16, 30, 0.86);
+  background: rgba(0, 0, 0, 0.72);
+  color: #fff;
 }
 
 .overlay.hidden {
@@ -96,6 +89,11 @@ canvas {
 .overlay h2 {
   margin: 0;
   font-size: clamp(1.5rem, 4vw, 2.4rem);
+}
+
+.overlay p {
+  margin: 0;
+  line-height: 1.5;
 }
 
 .overlay button {
@@ -123,26 +121,20 @@ canvas {
 }
 
 .touch-controls button {
-  min-width: 76px;
-  min-height: 64px;
-  border: 2px solid #2c4a70;
+  min-width: 82px;
+  min-height: 68px;
+  border: 0;
   border-radius: 14px;
   font-size: 1.3rem;
   font-weight: 800;
-  color: var(--text);
-  background: var(--panel);
+  color: #fff;
+  background: #333;
   touch-action: manipulation;
   user-select: none;
 }
 
 .touch-controls button:active {
-  background: #24507d;
-}
-
-.hint {
-  margin: 12px 4px 0;
-  color: #a8bad4;
-  font-size: 0.95rem;
+  background: #555;
 }
 
 @media (max-width: 760px) {
